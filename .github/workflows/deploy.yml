@@ -38,20 +38,26 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push Docker image
+        id: build-and-push-${{ matrix.service }}
         run: |
           DOCKERFILE="${{ matrix.service }}"
           IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
           docker build -t $IMAGE_URI -f $DOCKERFILE .
           docker push $IMAGE_URI
 
-      - name: Get image digest
-        id: get-digest
-        run: |
-          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
+          # Get image digest
           DIGEST=$(docker images --digests --format "{{.Digest}}" $IMAGE_URI)
-          echo "::set-output name=digest::$DIGEST"
+          echo "DIGEST_${{ matrix.service }}=$DIGEST" >> $GITHUB_ENV
 
       - name: Create and push Docker manifest
         run: |
           IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          DIGEST=${{ steps.get-digest.outputs.digest }}
+          DIGEST=$(cat $GITHUB_ENV | grep "DIGEST_${{ matrix.service }}" | cut -d '=' -f2)
+          docker manifest create $IMAGE_URI --amend $IMAGE_URI@$DIGEST
+          docker manifest push $IMAGE_URI
+
+      - name: Update ECS service
+        run: |
+          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
+          echo "Updating service ${{ matrix.service }} with image $IMAGE_URI"
+          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service ${{ matrix.service }} --force-new-deployment --region $AWS_REGION --desired-count 1
