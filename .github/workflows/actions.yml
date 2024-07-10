@@ -23,10 +23,10 @@ jobs:
         run: sudo apt-get install dos2unix
 
       - name: Convert line endings
-        run: dos2unix ./build/git_update.sh
+        run: dos2unix ./${{ matrix.service }}/git_update.sh
 
       - name: List build directory contents
-        run: ls -alh build
+        run: ls -alh ./${{ matrix.service }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -42,8 +42,8 @@ jobs:
       - name: Automatic Tagging of Releases
         id: increment-git-tag
         run: |
-          chmod +x ./build/git_update.sh
-          bash ./build/git_update.sh -v major
+          chmod +x ./${{ matrix.service }}/git_update.sh
+          bash ./${{ matrix.service }}/git_update.sh -v major
 
       - name: Build, Tag, and Push the Image to Amazon ECR
         id: build-image-${{ matrix.service }}
@@ -52,10 +52,5 @@ jobs:
           ECR_REPOSITORY: lesson-086
           IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |
-          DOCKERFILE="${{ matrix.service }}"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./${{ matrix.service }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-          # Output image digest to environment file
-          DIGEST=$(docker images --digests --format "{{.Digest}}" $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
-          echo "DIGEST_${{ matrix.service }}=$DIGEST" >> $GITHUB_ENV
