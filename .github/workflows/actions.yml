@@ -46,7 +46,7 @@ jobs:
           bash ./build/git_update.sh -v major
 
       - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image
+        id: build-image-${{ matrix.service }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: lesson-086
@@ -55,3 +55,7 @@ jobs:
           DOCKERFILE="${{ matrix.service }}"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          # Output image digest to environment file
+          DIGEST=$(docker images --digests --format "{{.Digest}}" $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
+          echo "DIGEST_${{ matrix.service }}=$DIGEST" >> $GITHUB_ENV
