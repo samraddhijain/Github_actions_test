@@ -10,8 +10,13 @@ jobs:
 
     strategy:
       matrix:
-        environment: [staging, production, qa]
-        service: [service1]
+        include:
+          - environment: staging
+            service: service1
+          - environment: production
+            service: service2
+          - environment: qa
+            service: service3
 
     steps:
       - name: Checkout
