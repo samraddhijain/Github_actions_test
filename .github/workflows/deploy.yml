@@ -9,15 +9,15 @@ jobs:
     name: Build, Push Docker Images to ECR, and Update ECS Services
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        service: ["image1", "image2", "image3"]
+
     env:
       AWS_REGION: "us-east-1"
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
       ECS_CLUSTER_NAME: "upload_ECS"
-
-    strategy:
-      matrix:
-        service: ["image1", "image2", "image3"]
 
     steps:
       - name: Checkout code
