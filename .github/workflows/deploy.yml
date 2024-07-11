@@ -1,52 +1,47 @@
-name: Build and Push Golang Image to AWS ECR
+name: Build, Push Docker image to ECR, and Update ECS
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-push:
-    name: Build and Push to ECR
+  build-and-deploy:
+    name: Build, Push Docker image to ECR, and Update ECS
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Ensure all tags are fetched
 
-      - name: Install dos2unix
-        run: sudo apt-get install dos2unix
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-      - name: Convert line endings
-        run: dos2unix ./build/git_update.sh
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: List build directory contents
-        run: ls -alh build
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
+      - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Automatic Tagging of Releases
-        id: increment-git-tag
-        run: |
-          chmod +x ./build/git_update.sh
-          bash ./build/git_update.sh -v major
-
-      - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image
+      - name: Build and push Docker image
+        id: build-and-push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: lesson-086
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Update ECS service
+        env:
+          AWS_REGION: us-east-1
+          AWS_ACCOUNT_ID: 533267409793
+          ECR_REPOSITORY: lesson-086
+          IMAGE_TAG: ${{ github.sha }}
+          ECS_CLUSTER_NAME: upload_ECS
+          ECS_SERVICE_NAME: web-service
+        run: |
+          echo "Updating ECS service..."
+          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
+
