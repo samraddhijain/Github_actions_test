@@ -22,15 +22,12 @@ jobs:
           - environment: staging
             service: service1
             dockerfile: Dockerfile.web_1
-            container_name: container1
           - environment: production
             service: service2
             dockerfile: Dockerfile.web_2
-            container_name: container2
           - environment: qa
             service: service3
             dockerfile: Dockerfile.web_3
-            container_name: container3
 
     steps:
       - name: Checkout code
