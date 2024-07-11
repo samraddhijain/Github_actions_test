@@ -21,10 +21,17 @@ jobs:
         include:
           - environment: staging
             service: service1
+            dockerfile: Dockerfile.image1
+            container_name: container1
           - environment: production
             service: service2
+            dockerfile: Dockerfile.image2
+            container_name: container2
           - environment: qa
             service: service3
+            dockerfile: Dockerfile.image3
+            container_name: container3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,7 +55,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          DOCKERFILE="Dockerfile.${{ matrix.environment }}"
+          DOCKERFILE="${{ matrix.dockerfile }}"
           IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
           docker build -t $IMAGE_URI -f $DOCKERFILE .
           docker push $IMAGE_URI
@@ -60,12 +67,35 @@ jobs:
           DIGEST=$(docker images --digests --format "{{.Digest}}" $IMAGE_URI)
           echo "::set-output name=digest::$DIGEST"
 
-      - name: Create and push Docker manifest
+      - name: Create ECS task definition
         run: |
           IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          DIGEST=${{ steps.get-digest.outputs.digest }}
-          docker manifest create $IMAGE_URI --amend $IMAGE_URI@${DIGEST}
-          docker manifest push $IMAGE_URI
+          cat <<EOF > ecs-task-def.json
+          {
+            "family": "${{ matrix.service }}-task-family",
+            "containerDefinitions": [
+              {
+                "name": "${{ matrix.container_name }}",
+                "image": "$IMAGE_URI",
+                "essential": true,
+                "memory": 512,
+                "cpu": 256,
+                "portMappings": [
+                  {
+                    "containerPort": 80,
+                    "hostPort": 80
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
+
+      - name: Register ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ecs-task-def.json
 
       - name: Update ECS service
         run: |
