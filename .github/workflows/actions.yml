@@ -18,8 +18,19 @@ jobs:
 
     strategy:
       matrix:
-        environment: [staging, production, qa]
-        service: [service1]
+        include:
+          - environment: staging
+            service: service1
+            dockerfile: Dockerfile.web_1
+            container_name: container1
+          - environment: production
+            service: service2
+            dockerfile: Dockerfile.web_2
+            container_name: container2
+          - environment: qa
+            service: service3
+            dockerfile: Dockerfile.web_3
+            container_name: container3
 
     steps:
       - name: Checkout code
@@ -42,30 +53,49 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push Docker image
+      - name: Build and push Docker images
         run: |
-          DOCKERFILE="Dockerfile.${{ matrix.environment }}"
-          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          docker build -t $IMAGE_URI -f $DOCKERFILE .
-          docker push $IMAGE_URI
+          for DOCKERFILE in Dockerfile.image1 Dockerfile.image2 Dockerfile.image3; do
+            IMAGE_NAME="${DOCKERFILE#Dockerfile.}"
+            IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:$IMAGE_NAME"
+            docker build -t $IMAGE_URI -f $DOCKERFILE .
+            docker push $IMAGE_URI
+          done
 
-      - name: Get image digest
-        id: get-digest
+      - name: Get image digests
+        id: get-digests
         run: |
-          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          DIGEST=$(docker images --digests --format "{{.Digest}}" $IMAGE_URI)
-          echo "::set-output name=digest::$DIGEST"
+          for DOCKERFILE in Dockerfile.image1 Dockerfile.image2 Dockerfile.image3; do
+            IMAGE_NAME="${DOCKERFILE#Dockerfile.}"
+            IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:$IMAGE_NAME"
+            DIGEST=$(docker images --digests --format "{{.Digest}}" $IMAGE_URI)
+            echo "::set-output name=digest_${IMAGE_NAME}::$DIGEST"
+          done
 
-      - name: Create and push Docker manifest
-        run: |
-          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          DIGEST=${{ steps.get-digest.outputs.digest }}
-          docker manifest create $IMAGE_URI --amend $IMAGE_URI@${DIGEST}
-          docker manifest push $IMAGE_URI
 
-      - name: Update ECS service
+      - name: Create and push Docker manifests
         run: |
-          IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:latest"
-          echo "Updating service ${{ matrix.service }} with image $IMAGE_URI"
-          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service ${{ matrix.service }} --force-new-deployment --region $AWS_REGION --desired-count 1
-          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service ${{ matrix.service }} --force-new-deployment --region $AWS_REGION --desired-count 1
+          for DOCKERFILE in Dockerfile.image1 Dockerfile.image2 Dockerfile.image3; do
+            IMAGE_NAME="${DOCKERFILE#Dockerfile.}"
+            IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:$IMAGE_NAME"
+            DIGEST="${{ steps.get-digests.outputs['digest_'${IMAGE_NAME}] }}"
+            
+            docker manifest create $IMAGE_URI --amend $IMAGE_URI@${DIGEST}
+            docker manifest push $IMAGE_URI
+          done
+
+      - name: Register ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ecs-task-def.json
+
+      - name: Update ECS services
+        run: |
+          for DOCKERFILE in Dockerfile.image1 Dockerfile.image2 Dockerfile.image3; do
+            SERVICE_NAME="${DOCKERFILE#Dockerfile.}"
+            IMAGE_URI="$ECR_REGISTRY/${{ matrix.service }}:$SERVICE_NAME"
+            
+            echo "Updating service $SERVICE_NAME with image $IMAGE_URI"
+            aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $SERVICE_NAME --force-new-deployment --region $AWS_REGION --desired-count 1
+          done
