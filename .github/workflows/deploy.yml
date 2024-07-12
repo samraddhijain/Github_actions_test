@@ -108,5 +108,5 @@ jobs:
       - name: Get version tag for outputs
         id: get-version
         run: |
-          NEW_TAG=$(./increment-version.sh -v $VERSION)
+          NEW_TAG=$(./git_update.sh -v $VERSION)
           echo ::set-output name=version::$NEW_TAG
