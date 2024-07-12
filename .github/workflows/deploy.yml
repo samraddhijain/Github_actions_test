@@ -34,7 +34,8 @@ jobs:
         run: aws sts get-caller-identity
 
       - name: Debugging Docker login
-        run: echo "Docker login output: ${{ steps.login-ecr.outputs }}"
+        run: |
+          echo "Docker login output: ${{ steps.login-ecr.outputs }}"
 
       - name: Build and push Docker image
         env:
