@@ -53,7 +53,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: lesson-086
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service1
         run: |
