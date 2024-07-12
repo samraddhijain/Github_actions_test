@@ -30,6 +30,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Verify AWS CLI configuration
+        run: aws sts get-caller-identity
+
+      - name: Debugging Docker login
+        run: echo "Docker login output: ${{ steps.login-ecr.outputs }}"
+
       - name: Build and push Docker image
         id: build-and-push
         env:
@@ -37,10 +43,12 @@ jobs:
           ECR_REPOSITORY: lesson-086
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "Building Docker image..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Pushing Docker image..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update ECS service
+      - name: Debugging ECS update
         env:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -49,5 +57,5 @@ jobs:
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service
         run: |
-          echo "Updating ECS service..."
+          echo "Updating ECS service with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
