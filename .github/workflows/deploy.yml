@@ -42,7 +42,7 @@ jobs:
           echo "Pushing Docker image for Service 1..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update ECS service for Service 1
+      - name: Update ECS service for Service 11
         if: success()
         env:
           AWS_REGION: us-east-1
@@ -50,12 +50,12 @@ jobs:
           ECR_REPOSITORY: testvj
           IMAGE_TAG: 156
           ECS_CLUSTER_NAME: upload_ECS
-          ECS_SERVICE_NAME: web-service1
+          ECS_SERVICE_NAME: web-service11
         run: |
           echo "Updating ECS service for Service 1 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
 
-      - name: Build and push Docker image for Service 2
+      - name: Build and push Docker image for Service 22
         id: build-and-push-service2
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -75,7 +75,7 @@ jobs:
           ECR_REPOSITORY: testvj
           IMAGE_TAG: 12023
           ECS_CLUSTER_NAME: upload_ECS
-          ECS_SERVICE_NAME: web-service2
+          ECS_SERVICE_NAME: web-service22
         run: |
           echo "Updating ECS service for Service 2 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
