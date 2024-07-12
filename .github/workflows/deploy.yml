@@ -50,7 +50,7 @@ jobs:
           ECR_REPOSITORY: testvj
           IMAGE_TAG: 156
           ECS_CLUSTER_NAME: upload_ECS
-          ECS_SERVICE_NAME: web-service11
+          ECS_SERVICE_NAME: web-service1111
         run: |
           echo "Updating ECS service for Service 1 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
@@ -75,7 +75,7 @@ jobs:
           ECR_REPOSITORY: testvj
           IMAGE_TAG: 12023
           ECS_CLUSTER_NAME: upload_ECS
-          ECS_SERVICE_NAME: web-service22
+          ECS_SERVICE_NAME: web-service2222
         run: |
           echo "Updating ECS service for Service 2 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
