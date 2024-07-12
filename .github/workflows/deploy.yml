@@ -37,7 +37,6 @@ jobs:
         run: echo "Docker login output: ${{ steps.login-ecr.outputs }}"
 
       - name: Build and push Docker image
-        id: build-and-push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: lesson-086
