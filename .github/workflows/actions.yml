@@ -42,7 +42,7 @@ jobs:
           ./build/git_update.sh -v major
 
       - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image2
+        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
@@ -53,26 +53,4 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
 
-      - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image3
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: demo
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-          echo "image_tag=$IMAGE_TAG" 
 
-      - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image4
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: lesson-086
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-          echo "image_tag=$IMAGE_TAG" 
