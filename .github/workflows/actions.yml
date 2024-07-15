@@ -52,7 +52,8 @@ jobs:
             
             run: |
               # docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_web_1 .
-              docker build -f Dockerfile_web_1
+              # docker build -f Dockerfile_web_1
+              docker build -f Dockerfile_web_1 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
               echo "image_tag=$IMAGE_TAG"
@@ -102,7 +103,7 @@ jobs:
             ECR_REPOSITORY: testvj
             IMAGE_TAG: 78
           run: |
-              docker build -f Dockerfile_web_2
+              docker build -f Dockerfile_web_2 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
               echo "image_tag=$IMAGE_TAG"
@@ -150,7 +151,7 @@ jobs:
             IMAGE_TAG: 79
             
             run: |
-              docker build -f Dockerfile_web_3
+              docker build -f Dockerfile_web_3 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
               echo "image_tag=$IMAGE_TAG"
