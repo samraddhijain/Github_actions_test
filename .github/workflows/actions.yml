@@ -51,7 +51,7 @@ jobs:
             IMAGE_TAG: 77
             
             run: |
-              docker build • •-file Dockerfile_web_1 ••tag ay-app-dotnet:$(date +s)
+              docker build -f Dockerfile_web_1
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
               echo "image_tag=$IMAGE_TAG"
