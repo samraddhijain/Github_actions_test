@@ -45,4 +45,4 @@ COPY . /robot
 COPY updated_env_web_3.json /robot/Runners/Environment/web_environment.json
 
 # Execute the Robot Framework test cases
-CMD ["robot","/robot/Web/RR/TestCases/Login/login_test.robot"]
+CMD ["robot","/robot/Web/RR/TestCases/News listing/News_listing_test.robot"]
