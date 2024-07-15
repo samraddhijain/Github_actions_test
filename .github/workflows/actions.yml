@@ -48,7 +48,7 @@ jobs:
           env:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: testvj
-            IMAGE_TAG: 100
+            IMAGE_TAG: 77
             
             run: |
               docker build • •-file Dockerfile_Web_1 ••tag ay-app-dotnet:$(date +s)
@@ -99,7 +99,7 @@ jobs:
           env:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: testvj
-            IMAGE_TAG: 101
+            IMAGE_TAG: 78
           run: |
               docker build • •-file Dockerfile_Web_2 ••tag ay-app-dotnet:$(date +s)
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -146,7 +146,7 @@ jobs:
           env:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: testvj
-            IMAGE_TAG: 102
+            IMAGE_TAG: 79
             
             run: |
               docker build • •-file Dockerfile_Web_3 ••tag ay-app-dotnet:$(date +s)
