@@ -31,11 +31,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push Docker image for Service 11
-        id: build-and-push-service1
+        id: build-and-push-service11
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 100
+          IMAGE_TAG: 77
         run: |
           echo "Building Docker image for Service 11..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -48,7 +48,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 101
+          IMAGE_TAG: 77
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service11
         run: |
@@ -60,7 +60,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 102
+          IMAGE_TAG: 78
         run: |
           echo "Building Docker image for Service 33..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -73,7 +73,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 12023
+          IMAGE_TAG: 78
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service33
         run: |
@@ -85,7 +85,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 12023
+          IMAGE_TAG: 79
         run: |
           echo "Building Docker image for Service 99..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -98,7 +98,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 1001
+          IMAGE_TAG: 79
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service99
         run: |
