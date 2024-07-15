@@ -35,7 +35,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 156
+          IMAGE_TAG: 100
         run: |
           echo "Building Docker image for Service 11..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -48,36 +48,11 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 156
+          IMAGE_TAG: 101
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service11
         run: |
           echo "Updating ECS service for Service 11 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
-
-      - name: Build and push Docker image for Service 22
-        id: build-and-push-service2
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: testvj
-          IMAGE_TAG: 12023
-        run: |
-          echo "Building Docker image for Service 22..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          echo "Pushing Docker image for Service 22..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Update ECS service for Service 22
-        if: success()
-        env:
-          AWS_REGION: us-east-1
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          ECR_REPOSITORY: testvj
-          IMAGE_TAG: 12023
-          ECS_CLUSTER_NAME: upload_ECS
-          ECS_SERVICE_NAME: web-service22
-        run: |
-          echo "Updating ECS service for Service 22 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
 
       - name: Build and push Docker image for Service 33
@@ -85,7 +60,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 12023
+          IMAGE_TAG: 102
         run: |
           echo "Building Docker image for Service 33..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -98,40 +73,34 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_REPOSITORY: testvj
-          IMAGE_TAG: 1001
+          IMAGE_TAG: 12023
           ECS_CLUSTER_NAME: upload_ECS
           ECS_SERVICE_NAME: web-service33
         run: |
           echo "Updating ECS service for Service 33 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
 
-      # - name: Build and push Docker image for Service 3
-      #   id: build-and-push-service3
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: lesson-086-service3
-      #     IMAGE_TAG: ${{ steps.get-version.outputs.version }}
-      #   run: |
-      #     echo "Building Docker image for Service 3..."
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #     echo "Pushing Docker image for Service 3..."
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Build and push Docker image for Service 99
+        id: build-and-push-service99
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: testvj
+          IMAGE_TAG: 12023
+        run: |
+          echo "Building Docker image for Service 99..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Pushing Docker image for Service 99..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # - name: Update ECS service for Service 3
-      #   if: success()
-      #   env:
-      #     AWS_REGION: us-east-1
-      #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      #     ECR_REPOSITORY: lesson-086-service3
-      #     IMAGE_TAG: ${{ steps.get-version.outputs.version }}
-      #     ECS_CLUSTER_NAME: upload_ECS
-      #     ECS_SERVICE_NAME: web-service3
-      #   run: |
-      #     echo "Updating ECS service for Service 3 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-      #     aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
-
-      # - name: Get version tag for outputs
-      #   id: get-version
-      #   run: |
-      #     NEW_TAG=$(./git_update.sh -v $VERSION)
-      #     echo ::set-output name=version::$NEW_TAG
+      - name: Update ECS service for Service 99
+        if: success()
+        env:
+          AWS_REGION: us-east-1
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_REPOSITORY: testvj
+          IMAGE_TAG: 1001
+          ECS_CLUSTER_NAME: upload_ECS
+          ECS_SERVICE_NAME: web-service99
+        run: |
+          echo "Updating ECS service for Service 99 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
