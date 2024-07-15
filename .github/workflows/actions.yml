@@ -49,10 +49,12 @@ jobs:
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
             ECR_REPOSITORY: testvj
             IMAGE_TAG: 12023
-          run: docker build • •-file Dockerfile_Web_1 ••tag ay-app-dotnet:$(date +s)
-               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-               echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-               echo "image_tag=$IMAGE_TAG"
+            
+            run: |
+              docker build • •-file Dockerfile_Web_1 ••tag ay-app-dotnet:$(date +s)
+              docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+              echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+              echo "image_tag=$IMAGE_TAG"
           # run: |
           #   docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . 
 
