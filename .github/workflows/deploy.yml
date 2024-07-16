@@ -7,7 +7,7 @@ on:
 jobs:
   build-and-deploy:
     name: Build, Push Docker image to ECR, and Update ECS
-    runs-on: ubuntu-latest
+    runs-on: alpine:latest
 
     steps:
       - name: Checkout code
