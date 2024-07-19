@@ -110,7 +110,7 @@ jobs:
               \"portMappings\": [
                 {
                   \"containerPort\": 80,
-                  \"hostPort\": 80
+                  \"hostPort\": 0
                 }
               ]
             },"
@@ -128,69 +128,9 @@ jobs:
             \"requiresCompatibilities\": [\"FARGATE\"],
             \"cpu\": \"1024\",
             \"memory\": \"2048\",
-            \"executionRoleArn\": \"arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR_EXECUTION_ROLE\",
-            \"taskRoleArn\": \"arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR_TASK_ROLE\"
+            \"executionRoleArn\": \"arn:aws:iam::533267409793:role/ecsTaskExecutionRole\",
+            \"taskRoleArn\": \"arn:aws:iam::533267409793:role/Task_Role_Policy\"
           }"
 
           echo "$TASK_DEF_JSON" > task-def.json
           aws ecs register-task-definition --cli-input-json file://task-def.json
-
-
-
-# name: Build, Push Docker image to ECR, and Update ECS
-
-# on:
-#   push:
-#     branches: [ main ]
-
-# jobs:
-#   build-and-deploy:
-#     name: Build, Push Docker image to ECR, and Update ECS
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-
-#       - name: Set up QEMU
-#         uses: docker/setup-qemu-action@v2
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
-
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: us-east-1
-
-#       - name: Log in to Amazon ECR
-#         id: login-ecr
-#         uses: aws-actions/amazon-ecr-login@v2
-
-#       - name: Build and push Docker image for Service
-#         id: build-and-push-service
-#         env:
-#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY: testvj
-#           IMAGE_TAG: 77
-#         run: |
-#           echo "Building Docker image for Service..."
-#           docker build -f Dockerfile_web_1 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-#           echo "Pushing Docker image for Service ..."
-#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-#       - name: Update ECS service for Service
-#         if: success()
-#         env:
-#           AWS_REGION: us-east-1
-#           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-#           ECR_REPOSITORY: testvj
-#           IMAGE_TAG: 77
-#           ECS_CLUSTER_NAME: upload_ECS
-#           ECS_SERVICE_NAME: web-service
-#         run: |
-#           echo "Updating ECS service for Service 101 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-#           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
-
