@@ -90,7 +90,7 @@ jobs:
           CLUSTER_NAME=demo-cluster
           TASK_DEFINITION_NAME=demo-task
 
-          DOCKERFILES=$(find ./web_dockerfiles -name 'Dockerfile*')
+          DOCKERFILES=$(find -name 'Dockerfile*')
           CONTAINERS_JSON=""
           PORT=8080  # Starting port for containerPort and hostPort
 
