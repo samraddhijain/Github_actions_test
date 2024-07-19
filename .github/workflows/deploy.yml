@@ -105,10 +105,6 @@ jobs:
 
             CONTAINER_CPU=256  # Adjust the CPU allocation as needed
             TOTAL_CPU=$((TOTAL_CPU + CONTAINER_CPU))
-            if [ $TOTAL_CPU -gt 1024 ]; then
-              echo "Error: The total CPU allocation for all containers exceeds the task-level CPU limit."
-              exit 1
-            fi
 
             CONTAINERS_JSON+="{
               \"name\": \"$CONTAINER_NAME\",
@@ -137,7 +133,7 @@ jobs:
               $CONTAINERS_JSON
             ],
             \"requiresCompatibilities\": [\"FARGATE\"],
-            \"cpu\": \"1024\",
+            \"cpu\": \"$TOTAL_CPU\",
             \"memory\": \"2048\",
             \"executionRoleArn\": \"arn:aws:iam::533267409793:role/ecsTaskExecutionRole\",
             \"taskRoleArn\": \"arn:aws:iam::533267409793:role/Task_Role_Policy\"
@@ -145,6 +141,20 @@ jobs:
 
           echo "$TASK_DEF_JSON" > task-def.json
           aws ecs register-task-definition --cli-input-json file://task-def.json
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+
+      - name: Create ECS Service
+        run: |
+          aws ecs create-service \
+            --cluster my-cluster \
+            --service-name my-service \
+            --task-definition my-task \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxxxx],securityGroups=[sg-xxxxxx],assignPublicIp=ENABLED}"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
