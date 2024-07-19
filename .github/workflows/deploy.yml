@@ -43,32 +43,6 @@ jobs:
           chmod +x ./build/git_update.sh
           ./build/git_update.sh -v major
 
-      # - name: Build, Tag, and Push Images to Amazon ECR
-      #   id: build-and-push
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: demo
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     # Find all Dockerfiles in the repository
-      #     DOCKERFILES=$(find . -name 'Dockerfile*')
-          
-      #     # Loop through the Dockerfiles and build/push images
-      #     for DOCKERFILE in $DOCKERFILES; do
-      #       # Extract the name part for tagging
-          #   BASENAME=$(basename $DOCKERFILE)
-          #   TAG=${BASENAME//Dockerfile_/}
-          #   TAG=${TAG:-default}  # Fallback to 'default' if no specific tag
-            
-          #   IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$TAG-$IMAGE_TAG"
-            
-          #   echo "Building and pushing Docker image for $DOCKERFILE to $IMAGE_URI"
-            
-          #   docker build -f $DOCKERFILE -t $IMAGE_URI .
-          #   docker push $IMAGE_URI
-            
-          #   echo "IMAGE $IMAGE_URI is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-          # done
       - name: Build, Tag, and Push Images to Amazon ECR
         id: build-and-push
         env:
@@ -178,71 +152,24 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
 
+      - name: Create ECS Service
+        run: |
+          CLUSTER_NAME=my-cluster
+          SERVICE_NAME=my-service
+          TASK_DEFINITION_NAME=my-task
+          SUBNETS=subnet-0bb3bf20e0804e17a  # Update with your subnets
+          SECURITY_GROUPS=sg-02c71277c7fbecb27  # Update with your security groups
 
-      # - name: Register ECS Task Definition
-      #   id: register-task-def
-      #   run: |
-      #     CLUSTER_NAME=my-cluster
-      #     TASK_DEFINITION_NAME=my-task
+          aws ecs create-service \
+            --cluster $CLUSTER_NAME \
+            --service-name $SERVICE_NAME \
+            --task-definition $TASK_DEFINITION_NAME \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUPS],assignPublicIp=ENABLED}"
 
-      #     DOCKERFILES=$(find . -name 'Dockerfile*')
-      #     CONTAINERS_JSON=""
-      #     PORT=8080  # Starting port for containerPort and hostPort
-      #     CONTAINER_CPU=256  # CPU units for each container
-      #     CONTAINER_MEMORY=512  # Memory for each container
-      #     TOTAL_CPU=0
-      #     TOTAL_MEMORY=0
-
-      #     for DOCKERFILE in $DOCKERFILES; do
-      #       BASENAME=$(basename $DOCKERFILE)
-      #       TAG=${BASENAME//Dockerfile_/}
-      #       TAG=${TAG:-default}  # Fallback to 'default' if no specific tag
-      #       IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$TAG-$IMAGE_TAG"
-
-        #     CONTAINER_NAME="${TAG}-container"
-
-        #     TOTAL_CPU=$((TOTAL_CPU + CONTAINER_CPU))
-        #     TOTAL_MEMORY=$((TOTAL_MEMORY + CONTAINER_MEMORY))
-
-        #     if [ $TOTAL_CPU -le 1024 ] && [ $TOTAL_MEMORY -le 2048 ]; then
-        #       CONTAINERS_JSON+="{
-        #         \"name\": \"$CONTAINER_NAME\",
-        #         \"image\": \"$IMAGE_URI\",
-        #         \"essential\": true,
-        #         \"memory\": $CONTAINER_MEMORY,
-        #         \"cpu\": $CONTAINER_CPU,
-        #         \"portMappings\": [
-        #           {
-        #             \"containerPort\": $PORT,
-        #             \"hostPort\": $PORT
-        #           }
-        #         ]
-        #       },"
-
-        #       PORT=$((PORT + 1))  # Increment port for next container
-        #     else
-        #       echo "Skipping container $CONTAINER_NAME due to resource limits."
-        #     fi
-        #   done
-
-        #   # Remove the trailing comma
-        #   CONTAINERS_JSON=${CONTAINERS_JSON%,}
-
-        #   TASK_DEF_JSON="{
-        #     \"family\": \"$TASK_DEFINITION_NAME\",
-        #     \"networkMode\": \"awsvpc\",
-        #     \"containerDefinitions\": [
-        #       $CONTAINERS_JSON
-        #     ],
-        #     \"requiresCompatibilities\": [\"FARGATE\"],
-        #     \"cpu\": \"1024\",
-        #     \"memory\": \"2048\",
-        #     \"executionRoleArn\": \"arn:aws:iam::533267409793:role/ecsTaskExecutionRole\"
-        #   }"
-
-        #   echo "$TASK_DEF_JSON" > task-definition.json
-        #   aws ecs register-task-definition --cli-input-json file://task-definition.json
-        # env:
-        #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #   AWS_DEFAULT_REGION: us-east-1
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
