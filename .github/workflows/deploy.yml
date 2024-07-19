@@ -160,24 +160,35 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
 
-      - name: Create ECS Service
+      - name: Create or Update ECS Service
         run: |
           CLUSTER_NAME=my-cluster
           SERVICE_NAME=my-service
           TASK_DEFINITION_NAME=my-task
-          SUBNETS=subnet-0bb3bf20e0804e17a  # Update with your subnets
-          SECURITY_GROUPS=sg-02c71277c7fbecb27  # Update with your security groups
 
-          aws ecs create-service \
-            --cluster $CLUSTER_NAME \
-            --service-name $SERVICE_NAME \
-            --task-definition $TASK_DEFINITION_NAME \
-            --desired-count 1 \
-            --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUPS],assignPublicIp=ENABLED}"
+          # Check if the service already exists
+          SERVICE_EXISTS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME --region us-east-1 --query 'services[0].status' --output text 2>/dev/null || echo "MISSING")
 
+          if [ "$SERVICE_EXISTS" == "MISSING" ]; then
+            # Create the service if it doesn't exist
+            aws ecs create-service \
+              --cluster $CLUSTER_NAME \
+              --service-name $SERVICE_NAME \
+              --taskDefinition $TASK_DEFINITION_NAME \
+              --desired-count 1 \
+              --launch-type FARGATE \
+              --network-configuration "awsvpcConfiguration={subnets=[subnet-0bb1c79de3EXAMPLE, subnet-0bb1c79de4EXAMPLE],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}" \
+              --region us-east-1
+          else
+            # Update the service if it exists
+            aws ecs update-service \
+              --cluster $CLUSTER_NAME \
+              --service $SERVICE_NAME \
+              --taskDefinition $TASK_DEFINITION_NAME \
+              --desired-count 1 \
+              --region us-east-1
+          fi
         env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
