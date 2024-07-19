@@ -121,7 +121,15 @@ jobs:
                     \"containerPort\": $PORT,
                     \"hostPort\": $PORT
                   }
-                ]
+                ],
+                \"logConfiguration\": {
+                  \"logDriver\": \"awslogs\",
+                  \"options\": {
+                    \"awslogs-group\": \"/ecs/$TASK_DEFINITION_NAME\",
+                    \"awslogs-region\": \"us-east-1\",
+                    \"awslogs-stream-prefix\": \"$CONTAINER_NAME\"
+                  }
+                }
               },"
 
               PORT=$((PORT + 1))  # Increment port for next container
