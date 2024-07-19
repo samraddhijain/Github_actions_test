@@ -90,7 +90,7 @@ jobs:
           CLUSTER_NAME=my-cluster
           TASK_DEFINITION_NAME=my-task
 
-          DOCKERFILES=$(find ./web_dockerfiles -name 'Dockerfile*')
+          DOCKERFILES=$(find -name 'Dockerfile*')
           CONTAINERS_JSON=""
 
           for DOCKERFILE in $DOCKERFILES; do
