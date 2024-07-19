@@ -70,6 +70,14 @@ jobs:
             echo "IMAGE $IMAGE_URI is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           done
 
+      - name: Install AWS CLI
+        run: sudo apt-get install -y awscli
+
+      - name: Create ECS Cluster
+        run: |
+          CLUSTER_NAME=demo-cluster
+          aws ecs create-cluster --cluster-name $CLUSTER_NAME
+
 
 
 
