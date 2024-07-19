@@ -87,12 +87,13 @@ jobs:
       - name: Register ECS Task Definition
         id: register-task-def
         run: |
-          CLUSTER_NAME=demo-cluster
-          TASK_DEFINITION_NAME=demo-task
+          CLUSTER_NAME=my-cluster
+          TASK_DEFINITION_NAME=my-task
 
-          DOCKERFILES=$(find -name 'Dockerfile*')
+          DOCKERFILES=$(find . -name 'Dockerfile*')
           CONTAINERS_JSON=""
           PORT=8080  # Starting port for containerPort and hostPort
+          TOTAL_CPU=0
 
           for DOCKERFILE in $DOCKERFILES; do
             BASENAME=$(basename $DOCKERFILE)
@@ -102,12 +103,19 @@ jobs:
 
             CONTAINER_NAME="${TAG}-container"
 
+            CONTAINER_CPU=256  # Adjust the CPU allocation as needed
+            TOTAL_CPU=$((TOTAL_CPU + CONTAINER_CPU))
+            if [ $TOTAL_CPU -gt 1024 ]; then
+              echo "Error: The total CPU allocation for all containers exceeds the task-level CPU limit."
+              exit 1
+            fi
+
             CONTAINERS_JSON+="{
               \"name\": \"$CONTAINER_NAME\",
               \"image\": \"$IMAGE_URI\",
               \"essential\": true,
               \"memory\": 512,
-              \"cpu\": 256,
+              \"cpu\": $CONTAINER_CPU,
               \"portMappings\": [
                 {
                   \"containerPort\": $PORT,
@@ -137,9 +145,7 @@ jobs:
 
           echo "$TASK_DEF_JSON" > task-def.json
           aws ecs register-task-definition --cli-input-json file://task-def.json
-          
-        # env:
-        #      AWS_DEFAULT_REGION: us-east-1
-        #      AWS_REGION: us-east-1
-        #      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
