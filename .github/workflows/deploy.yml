@@ -184,7 +184,7 @@ jobs:
             aws ecs update-service \
               --cluster $CLUSTER_NAME \
               --service $SERVICE_NAME \
-              --taskDefinition $TASK_DEFINITION_NAME \
+              --task-definition $TASK_DEFINITION_NAME \
               --desired-count 1 \
               --region us-east-1
           fi
