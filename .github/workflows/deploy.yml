@@ -149,3 +149,4 @@ jobs:
 #         run: |
 #           echo "Updating ECS service for Service 101 with image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 #           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_REGION
+
