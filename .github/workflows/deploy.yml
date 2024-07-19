@@ -93,7 +93,10 @@ jobs:
           DOCKERFILES=$(find . -name 'Dockerfile*')
           CONTAINERS_JSON=""
           PORT=8080  # Starting port for containerPort and hostPort
+          CONTAINER_CPU=256  # CPU units for each container
+          CONTAINER_MEMORY=512  # Memory for each container
           TOTAL_CPU=0
+          TOTAL_MEMORY=0
 
           for DOCKERFILE in $DOCKERFILES; do
             BASENAME=$(basename $DOCKERFILE)
@@ -103,24 +106,28 @@ jobs:
 
             CONTAINER_NAME="${TAG}-container"
 
-            CONTAINER_CPU=256  # Adjust the CPU allocation as needed
             TOTAL_CPU=$((TOTAL_CPU + CONTAINER_CPU))
+            TOTAL_MEMORY=$((TOTAL_MEMORY + CONTAINER_MEMORY))
 
-            CONTAINERS_JSON+="{
-              \"name\": \"$CONTAINER_NAME\",
-              \"image\": \"$IMAGE_URI\",
-              \"essential\": true,
-              \"memory\": 512,
-              \"cpu\": $CONTAINER_CPU,
-              \"portMappings\": [
-                {
-                  \"containerPort\": $PORT,
-                  \"hostPort\": $PORT
-                }
-              ]
-            },"
+            if [ $TOTAL_CPU -le 1024 ] && [ $TOTAL_MEMORY -le 2048 ]; then
+              CONTAINERS_JSON+="{
+                \"name\": \"$CONTAINER_NAME\",
+                \"image\": \"$IMAGE_URI\",
+                \"essential\": true,
+                \"memory\": $CONTAINER_MEMORY,
+                \"cpu\": $CONTAINER_CPU,
+                \"portMappings\": [
+                  {
+                    \"containerPort\": $PORT,
+                    \"hostPort\": $PORT
+                  }
+                ]
+              },"
 
-            PORT=$((PORT + 1))  # Increment port for next container
+              PORT=$((PORT + 1))  # Increment port for next container
+            else
+              echo "Skipping container $CONTAINER_NAME due to resource limits."
+            fi
           done
 
           # Remove the trailing comma
@@ -133,29 +140,6 @@ jobs:
               $CONTAINERS_JSON
             ],
             \"requiresCompatibilities\": [\"FARGATE\"],
-            \"cpu\": \"$TOTAL_CPU\",
+            \"cpu\": \"1024\",
             \"memory\": \"2048\",
-            \"executionRoleArn\": \"arn:aws:iam::533267409793:role/ecsTaskExecutionRole\",
-            \"taskRoleArn\": \"arn:aws:iam::533267409793:role/Task_Role_Policy\"
-          }"
-
-          echo "$TASK_DEF_JSON" > task-def.json
-          aws ecs register-task-definition --cli-input-json file://task-def.json
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
-
-      - name: Create ECS Service
-        run: |
-          aws ecs create-service \
-            --cluster my-cluster \
-            --service-name my-service \
-            --task-definition my-task \
-            --desired-count 1 \
-            --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxxxx],securityGroups=[sg-xxxxxx],assignPublicIp=ENABLED}"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
+            \"executionRoleArn\": \"arn:aws:iam::
