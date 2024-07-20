@@ -74,6 +74,12 @@ jobs:
             echo "$TAG:$IMAGE_URI" >> image-uris.txt
           done
 
+      - name: Verify Image URIs
+        run: |
+          echo "Contents of image-uris.txt:"
+          cat image-uris.txt
+
+
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -82,7 +88,7 @@ jobs:
 
       - name: Create Log Group
         run: |
-          aws logs create-log-group --log-group-name /ecs/demo-task || true
+          aws logs create-log-group --log-group-name /ecs/my-task || true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -90,7 +96,7 @@ jobs:
 
       - name: Create ECS Cluster
         run: |
-          aws ecs create-cluster --cluster-name demo-cluster --region us-east-1 || true
+          aws ecs create-cluster --cluster-name my-cluster --region us-east-1 || true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -99,8 +105,8 @@ jobs:
       - name: Register ECS Task Definition
         id: register-task-def
         run: |
-          CLUSTER_NAME=demo-cluster
-          TASK_DEFINITION_NAME=demo-task
+          CLUSTER_NAME=my-cluster
+          TASK_DEFINITION_NAME=my-task
 
           DOCKERFILES=$(find . -name 'Dockerfile*')
           CONTAINERS_JSON=""
@@ -113,8 +119,6 @@ jobs:
           # Read image URIs from the file
           while IFS=: read -r TAG IMAGE_URI; do
             CONTAINER_NAME="${TAG}-container"
-
-            echo "Processing container: $CONTAINER_NAME with image URI: $IMAGE_URI"
 
             TOTAL_CPU=$((TOTAL_CPU + CONTAINER_CPU))
             TOTAL_MEMORY=$((TOTAL_MEMORY + CONTAINER_MEMORY))
@@ -172,9 +176,9 @@ jobs:
 
       - name: Create or Update ECS Service
         run: |
-          CLUSTER_NAME=demo-cluster
-          SERVICE_NAME=demo-service
-          TASK_DEFINITION_NAME=demo-task
+          CLUSTER_NAME=my-cluster
+          SERVICE_NAME=my-service
+          TASK_DEFINITION_NAME=my-task
 
           # Check if the service already exists
           SERVICE_EXISTS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME --query 'services[0].status' --output text --region us-east-1 2>/dev/null || echo "MISSING")
@@ -202,9 +206,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-
-
-
 
 # name: Build and Push Multiple Docker Images to AWS ECR
 
