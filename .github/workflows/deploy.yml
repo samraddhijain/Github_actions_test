@@ -116,6 +116,9 @@ jobs:
           TOTAL_CPU=0
           TOTAL_MEMORY=0
 
+          echo "Reading image URIs from image-uris.txt..."
+          cat image-uris.txt
+
           # Read image URIs from the file
           while IFS=: read -r TAG IMAGE_URI; do
             CONTAINER_NAME="${TAG}-container"
