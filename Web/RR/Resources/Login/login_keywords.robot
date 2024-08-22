@@ -212,14 +212,18 @@ Launch Application
 
     # Combine Chrome capabilities with BrowserStack capabilities
     ${combined_capabilities}    Create Dictionary
+    
     # Add Chrome capabilities
-    :FOR    ${key}    IN    @{chrome_capabilities.keys()}
-    \    ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
-    \    Set To Dictionary    ${combined_capabilities}    ${key}=${value}
+    FOR    ${key}    IN    ${chrome_capabilities.keys()}
+        ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
+        Set To Dictionary    ${combined_capabilities}    ${key}=${value}
+    END
+    
     # Add BrowserStack capabilities
-    :FOR    ${key}    IN    @{bstack_capabilities.keys()}
-    \    ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
-    \    Set To Dictionary    ${combined_capabilities}    ${key}=${value}
+    FOR    ${key}    IN    ${bstack_capabilities.keys()}
+        ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
+        Set To Dictionary    ${combined_capabilities}    ${key}=${value}
+    END
 
     # Open Browser using BrowserStack
     Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${combined_capabilities}
@@ -227,4 +231,3 @@ Launch Application
     # Set window size and maximize
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
     Maximize Browser Window
-
