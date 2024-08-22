@@ -1,0 +1,97 @@
+# name: BrowserStack Multi-Browser Testing
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+
+# jobs:
+#   test-chrome:
+#     runs-on: ubuntu-latest
+#     env:
+#       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+#       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+#       BROWSER: "Chrome"
+#       BROWSER_VERSION: "latest"
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v3
+#       with:
+#         python-version: '3.x'
+
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
+
+#     - name: Set execute permissions for .robot files
+#       run: |
+#         chmod +x Web/RR/TestCases/Login/login_test.robot
+
+#     - name: Run tests on BrowserStack (Chrome)
+#       run: |
+#         robot Web/RR/TestCases/Login/login_test.robot
+
+#   test-firefox:
+#     runs-on: ubuntu-latest
+#     env:
+#       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+#       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+#       BROWSER: "Firefox"
+#       BROWSER_VERSION: "latest"
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v3
+#       with:
+#         python-version: '3.x'
+
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
+
+#     - name: Set execute permissions for .robot files
+#       run: |
+#         chmod +x Web/RR/TestCases/Gaming/gaming_test.robot
+
+#     - name: Run tests on BrowserStack (Firefox)
+#       run: |
+#         robot Web/RR/TestCases/Gaming/gaming_test.robot
+
+#   test-edge:
+#     runs-on: ubuntu-latest
+#     env:
+#       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+#       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+#       BROWSER: "Edge"
+#       BROWSER_VERSION: "latest"
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v3
+#       with:
+#         python-version: '3.x'
+
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install -r requirements.txt
+
+#     - name: Set execute permissions for .robot files
+#       run: |
+#         chmod +x Web/RR/TestCases/Standings/standings_test.robot
+
+#     - name: Run tests on BrowserStack (Edge)
+#       run: |
+#         robot Web/RR/TestCases/Standings/standings_test.robot
