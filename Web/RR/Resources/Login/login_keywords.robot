@@ -25,7 +25,7 @@ open application and launch the URL
     Open Browser    https://stg-rr.sportz.io/    chrome
     Open Browser    https://stg-rr.sportz.io/    firefox
 
-Launch Application
+Launch Application Old
     ${env_data}  Get Environment Data    ${web_environment}
     ${env_data}  Create Dictionary  &{env_data}
     ${options}  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys
@@ -38,7 +38,7 @@ Launch Application
     ${prefs}  Create Dictionary  download.default_directory=${default_download_path}
     Call Method  ${options}  add_experimental_option  prefs  ${prefs}
 #    Call Method  ${options}  add_argument  headless
-    Open Browser   https://stg-rr.sportz.io/   https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
+    Open Browser   https://stg-rr.sportz.io/   Chrome
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
 #    Open Browser  ${env_data.RR_application_url}  ${env_data.browser}
     Maximize Browser Window
@@ -184,6 +184,40 @@ Create Dynamic Xpath
 Validate Email Address
     [Arguments]    ${email}
     Should Match Regexp    ${email}    ${VALID_EMAIL_REGEX}
+
+
+Launch Application
+    ${env_data}    Get Environment Data    ${web_environment}
+    ${env_data}    Create Dictionary  &{env_data}
+    
+    # Create ChromeOptions
+    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --disable-notifications
+    Call Method    ${options}    add_argument    --disable-infobars
+    Call Method    ${options}    add_argument    --disable-extensions
+    Call Method    ${options}    add_argument    --no-sandbox
+    Call Method    ${options}    add_argument    --headless
+    Call Method    ${options}    add_argument    --disable-dev-shm-usage
+    
+    # Set download preferences
+    ${prefs}    Create Dictionary    download.default_directory=${default_download_path}
+    Call Method    ${options}    add_experimental_option    prefs    ${prefs}
+
+    # Prepare desired capabilities for BrowserStack
+    ${capabilities}    Create Dictionary
+    Set To Dictionary    ${capabilities}    browserName    Chrome
+    Set To Dictionary    ${capabilities}    browserVersion    ${BROWSER_VERSION}
+    Set To Dictionary    ${capabilities}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
+
+    # Merge options with desired capabilities
+    Call Method    ${options}    merge    ${capabilities}
+    
+    # Open Browser using BrowserStack
+    Open Browser    ${env_data.RR_application_url}    browser=remote    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${capabilities}
+    
+    # Set window size and maximize
+    Set Window Size    ${env_data.window_height}    ${env_data.window_width}
+    Maximize Browser Window
 
 
 
