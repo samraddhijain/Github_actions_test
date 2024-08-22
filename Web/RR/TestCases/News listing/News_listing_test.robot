@@ -14,6 +14,7 @@ Test Teardown   Close Browser
 
 *** Test Cases ***
 Verify The Filter Functionality By Year
+    [Tags]      membership
     Select Value From Nav Dropdown  ${latestnav}     ${newsoption}
     Click On Share Icon For Any Article
     Click On Particular Element    ${twitter_option}
