@@ -15,7 +15,6 @@ ${BROWSERSTACK_USERNAME}    samraddhijain_u3ZA0h
 ${BROWSERSTACK_ACCESS_KEY}  LXYEYUQopws6rXRXNPF4
 ${BROWSERSTACK_URL}         https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
 ${BROWSER_VERSION}     latest
-${Browser}            Chrome
 
 
 *** Keywords ***
@@ -188,13 +187,44 @@ Validate Email Address
     Should Match Regexp    ${email}    ${VALID_EMAIL_REGEX}
 
 Launch Application
-    ${desired_capabilities} =  Create Dictionary
-    ...  browserName=${Browser}
-    ...  browserstack.user=${BROWSERSTACK_USERNAME}
-    ...  browserstack.key=${BROWSERSTACK_ACCESS_KEY}
-    ...  os=Windows
-    ...  os_version=10
-    ...  resolution=1920x1080
+    ${env_data}    Get Environment Data    ${web_environment}
+    ${env_data}    Create Dictionary    &{env_data}
 
-    Open Browser   https://stg-rr.sportz.io/   https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
+    # Create ChromeOptions
+    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --disable-notifications
+    Call Method    ${options}    add_argument    --disable-infobars
+    Call Method    ${options}    add_argument    --disable-extensions
+    Call Method    ${options}    add_argument    --no-sandbox
+    Call Method    ${options}    add_argument    --headless
+    Call Method    ${options}    add_argument    --disable-dev-shm-usage
+    
+    # Set download preferences
+    ${prefs}    Create Dictionary    download.default_directory=${default_download_path}
+    Call Method    ${options}    add_experimental_option    prefs    ${prefs}
 
+    # Convert ChromeOptions to Desired Capabilities
+    ${chrome_capabilities}    Call Method    ${options}    to_capabilities
+
+    # Prepare BrowserStack capabilities
+    ${bstack_options}    Create Dictionary    os=Windows    osVersion=10    sessionName=Robot Test Example
+    ${bstack_capabilities}    Create Dictionary    browserName=Chrome    browserVersion=${BROWSER_VERSION}    bstack:options=${bstack_options}
+
+    # Merge Chrome capabilities into BrowserStack capabilities
+    ${merged_capabilities}    Create Dictionary
+    FOR    ${key}    IN    ${chrome_capabilities.keys()}
+        ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
+        Set To Dictionary    ${merged_capabilities}    ${key}    ${value}
+    END
+    # Add BrowserStack capabilities
+    FOR    ${key}    IN    ${bstack_capabilities.keys()}
+        ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
+        Set To Dictionary    ${merged_capabilities}    ${key}    ${value}
+    END
+
+    # Open Browser using BrowserStack
+    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${merged_capabilities}
+    
+    # Set window size and maximize
+    Set Window Size    ${env_data.window_height}    ${env_data.window_width}
+    Maximize Browser Window
