@@ -244,9 +244,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set execute permissions for .robot files
+      run: |
+        chmod +x Web/RR/TestCases/Login/login_test.robot
+
     - name: Run tests on BrowserStack (Chrome)
       run: |
-        Web/RR/TestCases/Login/login_test.robot
+        robot Web/RR/TestCases/Login/login_test.robot
 
   test-firefox:
     runs-on: ubuntu-latest
@@ -269,9 +273,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run tests on BrowserStack (Firefox)
+    - name: Set execute permissions for .robot files
       run: |
-        Web/RR/TestCases/Login/login_test.robot
+        chmod +x Web/RR/TestCases/Login/login_test.robot
+
+    - name: Run tests on BrowserStack (firefox)
+      run: |
+        robot Web/RR/TestCases/Login/login_test.robot
 
   test-edge:
     runs-on: ubuntu-latest
@@ -294,6 +302,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set execute permissions for .robot files
+      run: |
+        chmod +x Web/RR/TestCases/Login/login_test.robot
+
     - name: Run tests on BrowserStack (Edge)
       run: |
-        Web/RR/TestCases/Login/login_test.robot
+        robot Web/RR/TestCases/Login/login_test.robot
