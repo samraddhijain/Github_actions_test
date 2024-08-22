@@ -13,11 +13,13 @@ Test Teardown   Close Browser
 
 *** Test Cases ***
 Verify Accordion Functionality
+     [Tags]      membership
     Select Value From Nav Dropdown  ${ipl_titlenav}     ${ipldropdown_val}
     Click On Accordion
     Able To See Latest 3 Matches For Team Stands And Scorecard Text
 
 Verify The Functionality Of Latest Match Card Redirection
+     [Tags]      membership
     Select Value From Nav Dropdown  ${ipl_titlenav}     ${ipldropdown_val}
     Click On Accordion
     ${text1}    Click On First Match Card
