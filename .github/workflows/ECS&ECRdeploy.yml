@@ -1,63 +1,32 @@
-name: Run Tests Based on Tags
+name: Membership Tag Workflow
 
 on:
   push:
-    branches:
-      - main
-
+    tags:
+      - 'membership*'
   workflow_dispatch:
 
 jobs:
-  run-tests-by-tags:
+  run-tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tag: [membership, payment, login] # Add your tags here
-
+    
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Ensure all tags are fetched
-
-      - name: Install dos2unix
-        run: sudo apt-get install -y dos2unix
-
-      - name: Convert line endings
-        run: dos2unix ./build/git_update.sh
-
-      - name: List build directory contents
-        run: ls -alh build
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      - name: List build directory contents
+        run: ls -alh build
 
-      - name: Automatic Tagging of Releases
-        id: increment-git-tag
+      - name: Run Tests with Membership Tag
         run: |
-          chmod +x ./build/git_update.sh
-          ./build/git_update.sh -v major
-
-      - name: Verify Environment
-        run: |
-          echo "Environment Variables:"
-          env
-
-      - name: Run tests by tag
-        run: |
-          robot --include ${tag} Web/RR/TestCases/
-
+          robot --include membership Web/RR/TestCases/
