@@ -186,11 +186,10 @@ Validate Email Address
     [Arguments]    ${email}
     Should Match Regexp    ${email}    ${VALID_EMAIL_REGEX}
 
-
 Launch Application
     ${env_data}    Get Environment Data    ${web_environment}
-    ${env_data}    Create Dictionary  &{env_data}
-    
+    ${env_data}    Create Dictionary    &{env_data}
+
     # Create ChromeOptions
     ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
     Call Method    ${options}    add_argument    --disable-notifications
@@ -208,12 +207,13 @@ Launch Application
     ${chrome_capabilities}    Call Method    ${options}    to_capabilities
 
     # Prepare BrowserStack capabilities
-    ${bstack_capabilities}    Create Dictionary
-    Set To Dictionary    ${bstack_capabilities}    browserName=Chrome    browserVersion=${BROWSER_VERSION}
-    Set To Dictionary    ${bstack_capabilities}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
+    ${bstack_options}    Create Dictionary    os=Windows    osVersion=10    sessionName=Robot Test Example
+    ${bstack_capabilities}    Create Dictionary    browserName=Chrome    browserVersion=${BROWSER_VERSION}    bstack:options=${bstack_options}
 
     # Merge Chrome capabilities with BrowserStack capabilities
-    ${bstack_capabilities}    Set To Dictionary    ${bstack_capabilities}    ${chrome_capabilities}
+    FOR    ${key}    IN    ${chrome_capabilities}
+        Set To Dictionary    ${bstack_capabilities}    ${key}    ${chrome_capabilities}[${key}]
+    END
 
     # Open Browser using BrowserStack
     Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${bstack_capabilities}
@@ -221,3 +221,4 @@ Launch Application
     # Set window size and maximize
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
     Maximize Browser Window
+
