@@ -187,38 +187,13 @@ Validate Email Address
     Should Match Regexp    ${email}    ${VALID_EMAIL_REGEX}
 
 Launch Application
-    ${env_data}    Get Environment Data    ${web_environment}
-    ${env_data}    Create Dictionary    &{env_data}
+    ${desired_capabilities} =  Create Dictionary
+    ...  browserName=${Browser}
+    ...  browserstack.user=${BROWSERSTACK_USERNAME}
+    ...  browserstack.key=${BROWSERSTACK_ACCESS_KEY}
+    ...  os=Windows
+    ...  os_version=10
+    ...  resolution=1920x1080
 
-    # Create ChromeOptions
-    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
-    Call Method    ${options}    add_argument    --disable-notifications
-    Call Method    ${options}    add_argument    --disable-infobars
-    Call Method    ${options}    add_argument    --disable-extensions
-    Call Method    ${options}    add_argument    --no-sandbox
-    Call Method    ${options}    add_argument    --headless
-    Call Method    ${options}    add_argument    --disable-dev-shm-usage
-    
-    # Set download preferences
-    ${prefs}    Create Dictionary    download.default_directory=${default_download_path}
-    Call Method    ${options}    add_experimental_option    prefs    ${prefs}
-
-    # Convert ChromeOptions to Desired Capabilities
-    ${chrome_capabilities}    Call Method    ${options}    to_capabilities
-
-    # Prepare BrowserStack capabilities
-    ${bstack_options}    Create Dictionary    os=Windows    osVersion=10    sessionName=Robot Test Example
-    ${bstack_capabilities}    Create Dictionary    browserName=Chrome    browserVersion=${BROWSER_VERSION}    bstack:options=${bstack_options}
-
-    # Merge Chrome capabilities with BrowserStack capabilities
-    FOR    ${key}    IN    ${chrome_capabilities}
-        Set To Dictionary    ${bstack_capabilities}    ${key}    ${chrome_capabilities}[${key}]
-    END
-
-    # Open Browser using BrowserStack
-    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${bstack_capabilities}
-    
-    # Set window size and maximize
-    Set Window Size    ${env_data.window_height}    ${env_data.window_width}
-    Maximize Browser Window
+    Open Browser   https://stg-rr.sportz.io/   remote_url=http://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}
 
