@@ -186,6 +186,7 @@ Validate Email Address
     [Arguments]    ${email}
     Should Match Regexp    ${email}    ${VALID_EMAIL_REGEX}
 
+
 Launch Application
     ${env_data}    Get Environment Data    ${web_environment}
     ${env_data}    Create Dictionary    &{env_data}
@@ -207,20 +208,18 @@ Launch Application
     ${chrome_capabilities}    Call Method    ${options}    to_capabilities
 
     # Prepare BrowserStack capabilities
-    ${bstack_capabilities}    Create Dictionary
-    Set To Dictionary    ${bstack_capabilities}    browserName=Chrome    browserVersion=${BROWSER_VERSION}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
+    ${bstack_options}    Create Dictionary    os=Windows    osVersion=10    sessionName=Robot Test Example
+    ${bstack_capabilities}    Create Dictionary    browserName=Chrome    browserVersion=${BROWSER_VERSION}    'bstack:options'=${bstack_options}
 
     # Merge Chrome capabilities into BrowserStack capabilities
     ${combined_capabilities}    Create Dictionary
-    # Add BrowserStack capabilities
-    FOR    ${key}    IN    ${bstack_capabilities.keys()}
-        ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
-        Set To Dictionary    ${combined_capabilities}    ${key}    ${value}
-    END
-    # Add Chrome capabilities
     FOR    ${key}    IN    ${chrome_capabilities.keys()}
         ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
-        Set To Dictionary    ${combined_capabilities}    ${key}    ${value}
+        Set To Dictionary    ${combined_capabilities}    ${key}=${value}
+    END
+    FOR    ${key}    IN    ${bstack_capabilities.keys()}
+        ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
+        Set To Dictionary    ${combined_capabilities}    ${key}=${value}
     END
 
     # Open Browser using BrowserStack
@@ -229,4 +228,3 @@ Launch Application
     # Set window size and maximize
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
     Maximize Browser Window
-
