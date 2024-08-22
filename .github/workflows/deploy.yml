@@ -275,11 +275,11 @@ jobs:
 
     - name: Set execute permissions for .robot files
       run: |
-        chmod +x Web/RR/TestCases/Login/login_test.robot
+        chmod +x Web/RR/TestCases/Gaming/gaming_test.robot
 
     - name: Run tests on BrowserStack (firefox)
       run: |
-        robot Web/RR/TestCases/Players/Players_test.robot
+        robot Web/RR/TestCases/Gaming/gaming_test.robot
 
   test-edge:
     runs-on: ubuntu-latest
@@ -308,4 +308,4 @@ jobs:
 
     - name: Run tests on BrowserStack (Edge)
       run: |
-        robot Web/RR/TestCases/Login/login_test.robot
+        robot Web/RR/TestCases/Standings/standings_test.robot
