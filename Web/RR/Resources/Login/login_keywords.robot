@@ -14,6 +14,7 @@ ${VALID_EMAIL_REGEX}    ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
 ${BROWSERSTACK_USERNAME}    samraddhijain_u3ZA0h
 ${BROWSERSTACK_ACCESS_KEY}  LXYEYUQopws6rXRXNPF4
 ${BROWSERSTACK_URL}         https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
+${BROWSER_VERSION}     latest
 
 
 *** Keywords ***
