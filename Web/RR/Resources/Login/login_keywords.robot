@@ -15,6 +15,7 @@ ${BROWSERSTACK_USERNAME}    samraddhijain_u3ZA0h
 ${BROWSERSTACK_ACCESS_KEY}  LXYEYUQopws6rXRXNPF4
 ${BROWSERSTACK_URL}         https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
 
+
 *** Keywords ***
 open application and launch the URL
     ${options} =  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
@@ -37,7 +38,7 @@ Launch Application
     ${prefs}  Create Dictionary  download.default_directory=${default_download_path}
     Call Method  ${options}  add_experimental_option  prefs  ${prefs}
 #    Call Method  ${options}  add_argument  headless
-    Open Browser   https://stg-rr.sportz.io/   remote_url=http://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}
+    Open Browser   https://stg-rr.sportz.io/   https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
 #    Open Browser  ${env_data.RR_application_url}  ${env_data.browser}
     Maximize Browser Window
