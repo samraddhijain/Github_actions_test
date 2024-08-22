@@ -204,18 +204,20 @@ Launch Application
     ${prefs}    Create Dictionary    download.default_directory=${default_download_path}
     Call Method    ${options}    add_experimental_option    prefs    ${prefs}
 
-    # Prepare desired capabilities for BrowserStack
-    ${capabilities}    Create Dictionary
-    Set To Dictionary    ${capabilities}    browserName    Chrome
-    Set To Dictionary    ${capabilities}    browserVersion    ${BROWSER_VERSION}
-    Set To Dictionary    ${capabilities}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
+    # Convert ChromeOptions to Desired Capabilities
+    ${chrome_capabilities}    Call Method    ${options}    to_capabilities
 
-    # Convert ChromeOptions to Dictionary and add to capabilities
-    ${chrome_options_dict}    Call Method    ${options}    to_capabilities
-    Set To Dictionary    ${capabilities}    goog:chromeOptions    ${chrome_options_dict}['goog:chromeOptions']
-    
+    # Prepare desired capabilities for BrowserStack
+    ${bstack_capabilities}    Create Dictionary
+    Set To Dictionary    ${bstack_capabilities}    browserName    Chrome
+    Set To Dictionary    ${bstack_capabilities}    browserVersion    ${BROWSER_VERSION}
+    Set To Dictionary    ${bstack_capabilities}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
+
+    # Merge Chrome capabilities with BrowserStack capabilities
+    Set To Dictionary    ${bstack_capabilities}    ${chrome_capabilities}
+
     # Open Browser using BrowserStack
-    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${capabilities}
+    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${bstack_capabilities}
     
     # Set window size and maximize
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
