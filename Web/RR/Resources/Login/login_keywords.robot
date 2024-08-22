@@ -11,20 +11,11 @@ Resource    ../Fixtures and Results/fixturesresults_keywords.robot
 *** Variables ***
 ${web_environment}  ${CURDIR}${/}..${/}..${/}..${/}..${/}Runners${/}Environment${/}web_environment.json
 ${VALID_EMAIL_REGEX}    ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
-${BROWSERSTACK_USERNAME}    ${BROWSERSTACK_USERNAME}
-${BROWSERSTACK_ACCESS_KEY}  ${BROWSERSTACK_ACCESS_KEY}
+${BROWSERSTACK_USERNAME}    samraddhijain_u3ZA0h
+${BROWSERSTACK_ACCESS_KEY}  LXYEYUQopws6rXRXNPF4
 ${BROWSERSTACK_URL}         https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
 
 *** Keywords ***
-Launch Application
-    [Arguments]    ${browser}=${BROWSER}    ${browser_version}=${BROWSER_VERSION}    ${platform}=${PLATFORM}
-    ${options}=    Evaluate    sys.modules['selenium.webdriver'].DesiredCapabilities.${browser}
-    Set To Dictionary    ${options}    version    ${browser_version}
-    Set To Dictionary    ${options}    platform    ${platform}
-    Set To Dictionary    ${options}    name    Robot Test Example
-
-    Open Browser    https://example.com    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${options}
-
 open application and launch the URL
     ${options} =  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
     ${options_firefox} =    Evaluate    sys.modules['selenium.webdriver'].FirefoxOptions()    sys, selenium.webdriver
@@ -33,7 +24,7 @@ open application and launch the URL
     Open Browser    https://stg-rr.sportz.io/    chrome
     Open Browser    https://stg-rr.sportz.io/    firefox
 
-Launch Application New
+Launch Application
     ${env_data}  Get Environment Data    ${web_environment}
     ${env_data}  Create Dictionary  &{env_data}
     ${options}  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys
@@ -46,7 +37,7 @@ Launch Application New
     ${prefs}  Create Dictionary  download.default_directory=${default_download_path}
     Call Method  ${options}  add_experimental_option  prefs  ${prefs}
 #    Call Method  ${options}  add_argument  headless
-    Open Browser     ${env_data.RR_application_url}    ${env_data.browser}  options=${options}
+    Open Browser   https://stg-rr.sportz.io/   remote_url=http://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
 #    Open Browser  ${env_data.RR_application_url}  ${env_data.browser}
     Maximize Browser Window
