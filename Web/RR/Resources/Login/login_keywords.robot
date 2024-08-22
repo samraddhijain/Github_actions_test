@@ -15,6 +15,7 @@ ${BROWSERSTACK_USERNAME}    samraddhijain_u3ZA0h
 ${BROWSERSTACK_ACCESS_KEY}  LXYEYUQopws6rXRXNPF4
 ${BROWSERSTACK_URL}         https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
 ${BROWSER_VERSION}     latest
+${Browser}            Chrome
 
 
 *** Keywords ***
