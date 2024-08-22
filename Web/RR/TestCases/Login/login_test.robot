@@ -13,6 +13,7 @@ ${testdata}    ${CURDIR}${/}..${/}..${/}TestData${/}LoginTestdata.xlsx
 *** Test Cases ***
 #OTP less login
 Tc01 Verify if new clicks on yes button
+     [Tags]      membership
     &{data}    fetch data by id    ${testdata}      2
     Click On Login Button
     Enter Mobile Number     ${data.mobile_number}
@@ -20,6 +21,7 @@ Tc01 Verify if new clicks on yes button
     Verify OTP less sign in pop-up should get displayed to user
 
 Tc02 Verify the click on whats app icon
+     [Tags]      membership
     &{data}    fetch data by id    ${testdata}      1
     Click On Login Button
     Enter Mobile Number     ${data.mobile_number}
@@ -28,6 +30,7 @@ Tc02 Verify the click on whats app icon
     Verify User should able to view barcode to scan
 
 Tc03 Login Step With OTP Existing User
+     [Tags]      membership
     &{data}    fetch data by id    ${testdata}     2
     Click On Login Button
     Verify Mobile Number Field
@@ -38,6 +41,7 @@ Tc03 Login Step With OTP Existing User
     Capture Page Screenshot
 
 Tc04 Verify If New User Enters Mobile Number And Clicks On NO Button
+     [Tags]      membership
     &{data}    fetch data by id    ${testdata}     1
     Click On Login Button
     Enter Mobile Number     ${data.mobile_number}
