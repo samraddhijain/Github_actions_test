@@ -196,5 +196,5 @@ Launch Application
     ...  os_version=10
     ...  resolution=1920x1080
 
-    Open Browser   https://stg-rr.sportz.io/   remote_url=http://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}
+    Open Browser   https://stg-rr.sportz.io/   https://${BROWSERSTACK_USERNAME}:${BROWSERSTACK_ACCESS_KEY}@hub-cloud.browserstack.com/wd/hub
 
