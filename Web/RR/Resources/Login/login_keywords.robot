@@ -207,24 +207,26 @@ Launch Application
     ${chrome_capabilities}    Call Method    ${options}    to_capabilities
 
     # Prepare BrowserStack capabilities
-    ${bstack_options}    Create Dictionary    os=Windows    osVersion=10    sessionName=Robot Test Example
-    ${bstack_capabilities}    Create Dictionary    browserName=Chrome    browserVersion=${BROWSER_VERSION}    bstack:options=${bstack_options}
+    ${bstack_capabilities}    Create Dictionary
+    Set To Dictionary    ${bstack_capabilities}    browserName=Chrome    browserVersion=${BROWSER_VERSION}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
 
     # Merge Chrome capabilities into BrowserStack capabilities
-    ${merged_capabilities}    Create Dictionary
-    FOR    ${key}    IN    ${chrome_capabilities.keys()}
-        ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
-        Set To Dictionary    ${merged_capabilities}    ${key}    ${value}
-    END
+    ${combined_capabilities}    Create Dictionary
     # Add BrowserStack capabilities
     FOR    ${key}    IN    ${bstack_capabilities.keys()}
         ${value}    Get From Dictionary    ${bstack_capabilities}    ${key}
-        Set To Dictionary    ${merged_capabilities}    ${key}    ${value}
+        Set To Dictionary    ${combined_capabilities}    ${key}    ${value}
+    END
+    # Add Chrome capabilities
+    FOR    ${key}    IN    ${chrome_capabilities.keys()}
+        ${value}    Get From Dictionary    ${chrome_capabilities}    ${key}
+        Set To Dictionary    ${combined_capabilities}    ${key}    ${value}
     END
 
     # Open Browser using BrowserStack
-    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${merged_capabilities}
+    Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${combined_capabilities}
     
     # Set window size and maximize
     Set Window Size    ${env_data.window_height}    ${env_data.window_width}
     Maximize Browser Window
+
