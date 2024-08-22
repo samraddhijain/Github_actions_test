@@ -207,14 +207,13 @@ Launch Application
     # Convert ChromeOptions to Desired Capabilities
     ${chrome_capabilities}    Call Method    ${options}    to_capabilities
 
-    # Prepare desired capabilities for BrowserStack
+    # Prepare BrowserStack capabilities
     ${bstack_capabilities}    Create Dictionary
-    Set To Dictionary    ${bstack_capabilities}    browserName    Chrome
-    Set To Dictionary    ${bstack_capabilities}    browserVersion    ${BROWSER_VERSION}
+    Set To Dictionary    ${bstack_capabilities}    browserName=Chrome    browserVersion=${BROWSER_VERSION}
     Set To Dictionary    ${bstack_capabilities}    'bstack:options'    {'os': 'Windows', 'osVersion': '10', 'sessionName': 'Robot Test Example'}
 
     # Merge Chrome capabilities with BrowserStack capabilities
-    Set To Dictionary    ${bstack_capabilities}    ${chrome_capabilities}
+    ${bstack_capabilities}    Set To Dictionary    ${bstack_capabilities}    ${chrome_capabilities}
 
     # Open Browser using BrowserStack
     Open Browser    ${env_data.RR_application_url}    remote_url=${BROWSERSTACK_URL}    desired_capabilities=${bstack_capabilities}
