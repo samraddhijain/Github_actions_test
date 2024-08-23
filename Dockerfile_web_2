@@ -4,10 +4,11 @@ FROM ubuntu:20.04
 # Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Define build-time argument
-ARG TAG_NAME
+#new added lines
+# Define an argument for the tag name
+ARG TAG_NAME=membership
 
-# Install necessary packages
+# Update the image and install system packages
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -27,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     wmctrl
 
-# Install Robot Framework and SeleniumLibrary
+# Install Robot Framework and SeleniumLibrary along with other required Python packages
 RUN pip3 install selenium==4.15.2 \
                  robotframework==6.1.1 \
                  robotframework-seleniumlibrary==6.2.0 \
@@ -38,26 +39,14 @@ RUN pip3 install selenium==4.15.2 \
                  webdrivermanager \
                  pandas
 
-# Use a base image with Python
-FROM python:3.9-slim
+# Set the working directory
+WORKDIR /robot
 
-# Set working directory
-WORKDIR /app
-
-# Install Robot Framework and required libraries
-RUN pip install robotframework
-
-# Copy the test files based on TAG_NAME
+# Copy the current directory contents into the container at /robot
 COPY . /robot
 
-# Copy the specific test cases into the Docker image
-COPY ./Web/RR/TestCases/ /robot/tests/
+# Copy the environment JSON file into the container at /robot/Runners/Environment/web_environment.json
+COPY updated_env_web_1.json /robot/Runners/Environment/web_environment.json
 
-# Set the environment variable for the tag name
-ENV TAG_NAME=membership
-
-# Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "${TAG_NAME}", "/Web/RR/TestCases/"]
-
-
-
+# Execute the Robot Framework test cases
+#CMD ["robot","/robot/Web/RR/TestCases/Login/login_test.robot"]
