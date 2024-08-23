@@ -38,24 +38,27 @@ RUN pip3 install selenium==4.15.2 \
                  webdrivermanager \
                  pandas
 
-# Set the working directory
-WORKDIR /robot
-
-# Copy the test files based on TAG_NAME
-COPY . /robot
-COPY ./robot/Web/RR/TestCases/
-
-# Set the environment variable for the tag name
-ENV TAG_NAME=${TAG_NAME}
-
 # Use a base image with Python
 FROM python:3.9-slim
 
-# Copy your test suite into the Docker image
-COPY /path/to/your/tests /robot/tests
+# Set working directory
+WORKDIR /app
+
+# Install Robot Framework and required libraries
+RUN pip install robotframework
+
+# Copy the test files based on TAG_NAME
+COPY . /robot
+
+# Copy the specific test cases into the Docker image
+COPY ./robot/Web/RR/TestCases/ /robot/tests/
+
+# Set the environment variable for the tag name
+ENV TAG_NAME=membership
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "membership", "/robot/Web/RR/TestCases/"]
+CMD ["robot", "--include", "${TAG_NAME}", "/robot/tests/"]
+
 
 
 
