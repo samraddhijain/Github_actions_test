@@ -1,16 +1,15 @@
-name: Build and Push Multiple Docker Images to AWS ECR
+name: Build, Tag, and Push Docker Images to AWS ECR and Run Tests
 
 on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,18 +42,18 @@ jobs:
           chmod +x ./build/git_update.sh
           ./build/git_update.sh -v major
 
-      - name: Build, Tag, and Push Images to Amazon ECR   
+      - name: Build, Tag, and Push Images to Amazon ECR
         id: build-and-push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: demo
           IMAGE_TAG: ${{ github.sha }}
-          TAG_NAME: membership  # Set TAG_NAME to 'membership'
+          TAG_NAME: membership
         run: |
           # Find all Dockerfiles in the repository
           DOCKERFILES=$(find . -name 'Dockerfile*')
           > image-uris.txt  # Clear or create a file to store image URIs
-          
+
           # Loop through the Dockerfiles and build/push images
           for DOCKERFILE in $DOCKERFILES; do
             # Extract the name part for tagging
@@ -66,7 +65,7 @@ jobs:
             
             echo "Building and pushing Docker image for $DOCKERFILE to $IMAGE_URI"
             
-            docker build -f $DOCKERFILE -t $IMAGE_URI .
+            docker build -f $DOCKERFILE --build-arg TAG_NAME=$TAG_NAME -t $IMAGE_URI .
             docker push $IMAGE_URI
             
             echo "IMAGE $IMAGE_URI is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
@@ -209,3 +208,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
+
+      - name: Run Robot Framework Tests with Membership Tag
+        run: |
+          docker run --rm -v $(pwd)/path/to/your/tests:/robot/path/to/your/tests your-image-name robot --include membership /robot/path/to/your/tests
