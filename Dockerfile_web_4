@@ -51,4 +51,14 @@ ENV TAG_NAME=${TAG_NAME}
 # Command to execute test cases
 CMD ["robot", "/robot/path/to/your/tests/profile_test.robot"]
 
+# Use a base image with Python
+FROM python:3.9-slim
+
+# Copy your test suite into the Docker image
+COPY /path/to/your/tests /robot/tests
+
+# Set the default command to run Robot Framework with an option to specify tags
+CMD ["robot", "--include", "membership", "/robot/tests"]
+
+
 
