@@ -1,49 +1,120 @@
-# Use the latest Ubuntu LTS as the base image
-FROM ubuntu:20.04
-
-# Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update the image and install system packages
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    wget \
-    xvfb \
-    zip \
-    ca-certificates \
-    libnss3-dev \
-    libasound2 \
-    libxss1 \
-    libappindicator3-1 \
-    libindicator7 \
-    gconf-service \
-    libgconf-2-4 \
-    libpango1.0-0 \
-    xdg-utils \
-    fonts-liberation \
-    wmctrl
-
-# Install Robot Framework and SeleniumLibrary along with other required Python packages
-RUN pip3 install selenium==4.15.2 \
-                 robotframework==6.1.1 \
-                 robotframework-seleniumlibrary==6.2.0 \
-                 robotframework-retryfailed==0.2.0 \
-                 robotframework-pabot==2.16.0 \
-                 openpyxl==3.1.2 \
-                 allure-robotframework==2.13.2 \
-                 webdrivermanager \
-                 pandas
-
-# Set the working directory
-WORKDIR /robot
-
-# Copy the current directory contents into the container at /robot
-COPY . /robot
-
-# Copy the environment JSON file into the container at /robot/Runners/Environment/web_environment.json
-COPY updated_env_web_1.json /robot/Runners/Environment/web_environment.json
-
-# Execute the Robot Framework test cases
-CMD ["robot","/robot/Web/RR/TestCases/Profile/profile_test.robot"]
-
+#name: Membership Tag Workflow
+#
+#on:
+#  push:
+#    tags:
+#      - 'membership*'  # Triggers on tags starting with 'membership'
+#  workflow_dispatch:  # Allows manual triggering
+#
+#jobs:
+#  deploy_to_ecs:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Ensure all tags are fetched
+#
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-1
+#
+#      - name: Create Log Group
+#        run: |
+#          aws logs create-log-group --log-group-name /ecs/my-task || true
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_DEFAULT_REGION: us-east-1
+#
+#      - name: Create ECS Cluster
+#        run: |
+#          aws ecs create-cluster --cluster-name my-cluster --region us-east-1 || true
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_DEFAULT_REGION: us-east-1
+#
+#      - name: Register ECS Task Definition
+#        id: register-task-def
+#        run: |
+#          CLUSTER_NAME=my-cluster
+#          TASK_DEFINITION_NAME=my-task
+#
+#          CONTAINERS_JSON="[
+#            {
+#              \"name\": \"my-container\",
+#              \"image\": \"my-image:latest\",
+#              \"essential\": true,
+#              \"memory\": 512,
+#              \"cpu\": 256,
+#              \"portMappings\": [
+#                {
+#                  \"containerPort\": 8080,
+#                  \"hostPort\": 8080
+#                }
+#              ],
+#              \"logConfiguration\": {
+#                \"logDriver\": \"awslogs\",
+#                \"options\": {
+#                  \"awslogs-group\": \"/ecs/$TASK_DEFINITION_NAME\",
+#                  \"awslogs-region\": \"us-east-1\",
+#                  \"awslogs-stream-prefix\": \"my-container\"
+#                }
+#              }
+#            }
+#          ]"
+#
+#          TASK_DEF_JSON="{
+#            \"family\": \"$TASK_DEFINITION_NAME\",
+#            \"networkMode\": \"awsvpc\",
+#            \"containerDefinitions\": $CONTAINERS_JSON,
+#            \"requiresCompatibilities\": [\"FARGATE\"],
+#            \"cpu\": \"1024\",
+#            \"memory\": \"2048\",
+#            \"executionRoleArn\": \"arn:aws:iam::533267409793:role/ecsTaskExecutionRole\"
+#          }"
+#
+#          echo "$TASK_DEF_JSON" > task-definition.json
+#          aws ecs register-task-definition --cli-input-json file://task-definition.json
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_DEFAULT_REGION: us-east-1
+#
+#      - name: Create or Update ECS Service
+#        run: |
+#          CLUSTER_NAME=my-cluster
+#          SERVICE_NAME=my-service
+#          TASK_DEFINITION_NAME=my-task
+#
+#          # Check if the service already exists
+#          SERVICE_EXISTS=$(aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME --query 'services[0].status' --output text --region us-east-1 2>/dev/null || echo "MISSING")
+#
+#          if [ "$SERVICE_EXISTS" == "MISSING" ]; then
+#            # Create the service if it doesn't exist
+#            aws ecs create-service \
+#              --cluster $CLUSTER_NAME \
+#              --service-name $SERVICE_NAME \
+#              --task-definition $TASK_DEFINITION_NAME \
+#              --desired-count 1 \
+#              --launch-type FARGATE \
+#              --network-configuration "awsvpcConfiguration={subnets=[subnet-0bb1c79de3EXAMPLE, subnet-0bb1c79de4EXAMPLE],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}" \
+#              --region us-east-1
+#          else
+#            # Update the service if it exists
+#            aws ecs update-service \
+#              --cluster $CLUSTER_NAME \
+#              --service $SERVICE_NAME \
+#              --task-definition $TASK_DEFINITION_NAME \
+#              --desired-count 1 \
+#              --region us-east-1
+#          fi
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_DEFAULT_REGION: us-east-1
