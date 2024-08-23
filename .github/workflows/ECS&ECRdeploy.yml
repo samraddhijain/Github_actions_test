@@ -60,6 +60,7 @@
            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
            ECR_REPOSITORY: demo
            IMAGE_TAG: ${{ github.sha }}
+           TAG_NAME: ${{ inputs.tag_name }}
          run: |
            # Find all Dockerfiles in the repository
            DOCKERFILES=$(find . -name 'Dockerfile*')
@@ -84,7 +85,7 @@
              # Save the image URI to a file
              echo "$TAG:$IMAGE_URI" >> image-uris.txt
            done
-
+           
        - name: Verify Image URIs
          run: |
            echo "Contents of image-uris.txt:"
