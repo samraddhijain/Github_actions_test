@@ -43,7 +43,7 @@ WORKDIR /robot
 
 # Copy the test files based on TAG_NAME
 COPY . /robot
-COPY ./path/to/your/tests /robot/path/to/your/tests
+COPY ./robot/Web/RR/TestCases/
 
 # Set the environment variable for the tag name
 ENV TAG_NAME=${TAG_NAME}
