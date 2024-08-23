@@ -1,13 +1,10 @@
 name: Build and Push Multiple Docker Images to AWS ECR
 
-# on:
-#   push:
-#     branches:
-#       - main
 on:
   push:
-    tags:
-      - 'membership*' # Trigger the workflow only when a tag matching 'membership*' is pushed
+    branches:
+      - main
+
 
   workflow_dispatch:
 
