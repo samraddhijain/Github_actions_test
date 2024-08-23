@@ -48,9 +48,6 @@ COPY ./robot/Web/RR/TestCases/
 # Set the environment variable for the tag name
 ENV TAG_NAME=${TAG_NAME}
 
-# Command to execute test cases
-CMD ["robot", "/robot/path/to/your/tests/profile_test.robot"]
-
 # Use a base image with Python
 FROM python:3.9-slim
 
