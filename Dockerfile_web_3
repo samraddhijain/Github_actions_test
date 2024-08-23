@@ -51,7 +51,7 @@ RUN pip install robotframework
 COPY . /robot
 
 # Copy the specific test cases into the Docker image
-COPY ./robot/Web/RR/TestCases/ /robot/tests/
+COPY ./Web/RR/TestCases/ /robot/tests/
 
 # Set the environment variable for the tag name
 ENV TAG_NAME=membership
