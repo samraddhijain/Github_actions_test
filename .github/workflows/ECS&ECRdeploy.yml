@@ -47,13 +47,6 @@ jobs:
         run: |
           find . -name 'Dockerfile*'
 
-      - name: Debugging Environment Variables
-        run: |
-          echo "ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}"
-          echo "ECR_REPOSITORY: demo"
-          echo "IMAGE_TAG: ${{ github.sha }}"
-          echo "TAG_NAME: membership"
-
       - name: Build, Tag, and Push Images to Amazon ECR   
         id: build-and-push
         env:
@@ -65,8 +58,8 @@ jobs:
           set -e  # Exit immediately if a command exits with a non-zero status.
           set -x  # Print each command before executing it (for debugging).
 
-          # Build the Docker image with the TAG_NAME argument
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG --build-arg TAG_NAME=$TAG_NAME .
+          # Build the Docker image with the TAG_NAME argument, specifying the Dockerfile path
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG --build-arg TAG_NAME=$TAG_NAME -f build/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG
 
           echo "IMAGE $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
@@ -203,7 +196,6 @@ jobs:
               --task-definition $TASK_DEFINITION_NAME \
               --desired-count 1 \
               --region us-east-1
-          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
