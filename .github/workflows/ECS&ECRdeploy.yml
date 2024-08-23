@@ -211,4 +211,4 @@ jobs:
 
       - name: Run Robot Framework Tests with Membership Tag
         run: |
-          docker run --rm -v $(pwd)Web/RR/TestCases-image-name robot --include membership Web/RR/TestCases
+          docker run --rm -v $(pwd)/robot/Web/RR/TestCases/-image-name robot --include membership /robot/Web/RR/TestCases/
