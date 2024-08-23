@@ -58,7 +58,7 @@ FROM python:3.9-slim
 COPY /path/to/your/tests /robot/tests
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "membership", "/robot/tests"]
+CMD ["robot", "--include", "membership", "Web/RR/TestCases"]
 
 
 
