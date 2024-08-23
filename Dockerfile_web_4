@@ -4,6 +4,10 @@ FROM ubuntu:20.04
 # Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+#new added lines
+# Define an argument for the tag name
+ARG TAG_NAME=membership
+
 # Update the image and install system packages
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -45,5 +49,5 @@ COPY . /robot
 COPY updated_env_web_1.json /robot/Runners/Environment/web_environment.json
 
 # Execute the Robot Framework test cases
-CMD ["robot","/robot/Web/RR/TestCases/Login/login_test.robot"]
+#CMD ["robot","/robot/Web/RR/TestCases/Login/login_test.robot"]
 
