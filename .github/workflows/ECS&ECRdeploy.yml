@@ -9,15 +9,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_push:
+  build_and_test:
     runs-on: ubuntu-latest
-  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Ensure all tags are fetched
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t my-robot-tests .
+
+      - name: Run Tests with Specific Tag
+        run: docker run --rm -e TAG_NAME=membership my-robot-tests
+        
       - name: Install dos2unix
         run: sudo apt-get install -y dos2unix
 
