@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Build Docker Image
-        run: docker build -t my-robot-tests .
-
-      - name: Run Tests with Specific Tag
-        run: docker run --rm -e TAG_NAME=membership my-robot-tests
         
       - name: Install dos2unix
         run: sudo apt-get install -y dos2unix
@@ -78,6 +72,13 @@ jobs:
             # Save the image URI to a file
             echo "$TAG:$IMAGE_URI" >> image-uris.txt
           done
+
+      - name: Build Docker Image
+        run: docker build -t my-robot-tests .
+
+      - name: Run Tests with Specific Tag
+        run: docker run --rm -e TAG_NAME=membership my-robot-tests
+        
 
       - name: Verify Image URIs
         run: |
