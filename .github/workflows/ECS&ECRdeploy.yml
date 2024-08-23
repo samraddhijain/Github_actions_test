@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
   workflow_dispatch:
 
 jobs:
@@ -44,6 +43,13 @@ jobs:
           chmod +x ./build/git_update.sh
           ./build/git_update.sh -v major
 
+      - name: Debugging Environment Variables
+        run: |
+          echo "ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}"
+          echo "ECR_REPOSITORY: demo"
+          echo "IMAGE_TAG: ${{ github.sha }}"
+          echo "TAG_NAME: membership"
+
       - name: Build, Tag, and Push Images to Amazon ECR   
         id: build-and-push
         env:
@@ -52,6 +58,9 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           TAG_NAME: membership  # Set TAG_NAME to 'membership'
         run: |
+          set -e  # Exit immediately if a command exits with a non-zero status.
+          set -x  # Print each command before executing it (for debugging).
+
           # Build the Docker image with the TAG_NAME argument
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG --build-arg TAG_NAME=$TAG_NAME .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_NAME-$IMAGE_TAG
@@ -65,7 +74,6 @@ jobs:
         run: |
           echo "Contents of image-uris.txt:"
           cat image-uris.txt
-
 
       - name: Install AWS CLI
         run: |
@@ -196,5 +204,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-
-
