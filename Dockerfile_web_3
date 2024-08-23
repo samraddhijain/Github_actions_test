@@ -46,3 +46,4 @@
 #
 ## Execute the Robot Framework test cases
 #CMD ["robot","/robot/Web/RR/TestCases/Standings/standings_test.robot"]
+#
