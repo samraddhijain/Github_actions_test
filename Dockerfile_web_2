@@ -1,48 +1,63 @@
-## Use the latest Ubuntu LTS as the base image
-#FROM ubuntu:20.04
-#
-## Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
-#ENV DEBIAN_FRONTEND=noninteractive
-#
-## Update the image and install system packages
-#RUN apt-get update && apt-get install -y \
-#    python3 \
-#    python3-pip \
-#    wget \
-#    xvfb \
-#    zip \
-#    ca-certificates \
-#    libnss3-dev \
-#    libasound2 \
-#    libxss1 \
-#    libappindicator3-1 \
-#    libindicator7 \
-#    gconf-service \
-#    libgconf-2-4 \
-#    libpango1.0-0 \
-#    xdg-utils \
-#    fonts-liberation \
-#    wmctrl
-#
-## Install Robot Framework and SeleniumLibrary along with other required Python packages
-#RUN pip3 install selenium==4.15.2 \
-#                 robotframework==6.1.1 \
-#                 robotframework-seleniumlibrary==6.2.0 \
-#                 robotframework-retryfailed==0.2.0 \
-#                 robotframework-pabot==2.16.0 \
-#                 openpyxl==3.1.2 \
-#                 allure-robotframework==2.13.2 \
-#                 webdrivermanager \
-#                 pandas
-#
-## Set the working directory
-#WORKDIR /robot
-#
-## Copy the current directory contents into the container at /robot
-#COPY . /robot
-#
-## Copy the environment JSON file into the container at /robot/Runners/Environment/web_environment.json
-#COPY updated_env_web_2.json /robot/Runners/Environment/web_environment.json
-#
-## Execute the Robot Framework test cases
-#CMD ["robot","/robot/Web/RR/TestCases/Standings/standings_test.robot"]
+# Use the latest Ubuntu LTS as the base image
+FROM ubuntu:20.04
+
+# Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Define build-time argument
+ARG TAG_NAME
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    wget \
+    xvfb \
+    zip \
+    ca-certificates \
+    libnss3-dev \
+    libasound2 \
+    libxss1 \
+    libappindicator3-1 \
+    libindicator7 \
+    gconf-service \
+    libgconf-2-4 \
+    libpango1.0-0 \
+    xdg-utils \
+    fonts-liberation \
+    wmctrl
+
+# Install Robot Framework and SeleniumLibrary
+RUN pip3 install selenium==4.15.2 \
+                 robotframework==6.1.1 \
+                 robotframework-seleniumlibrary==6.2.0 \
+                 robotframework-retryfailed==0.2.0 \
+                 robotframework-pabot==2.16.0 \
+                 openpyxl==3.1.2 \
+                 allure-robotframework==2.13.2 \
+                 webdrivermanager \
+                 pandas
+
+# Use a base image with Python
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install Robot Framework and required libraries
+RUN pip install robotframework
+
+# Copy the test files based on TAG_NAME
+COPY . /robot
+
+# Copy the specific test cases into the Docker image
+COPY ./Web/RR/TestCases/ /robot/tests/
+
+# Set the environment variable for the tag name
+ENV TAG_NAME=membership
+
+# Set the default command to run Robot Framework with an option to specify tags
+CMD ["robot", "--include", "${TAG_NAME}", "/Web/RR/TestCases/"]
+
+
+
