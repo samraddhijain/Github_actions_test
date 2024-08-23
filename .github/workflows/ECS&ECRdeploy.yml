@@ -15,9 +15,14 @@
 
  jobs:
    build_and_push:
-     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      # ... (rest of the steps remain the same)
 
-     steps:
+       - name: Run Robot Framework Tests
+         run: |
+          robot -i ${tag_name} /robot/Web/RR/TestCases/
+
        - name: Checkout
          uses: actions/checkout@v4
          with:
