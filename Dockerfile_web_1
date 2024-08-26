@@ -42,7 +42,7 @@ RUN pip3 install selenium==4.15.2 \
 FROM python:3.9-slim
 
 # Set working directory
-WORKDIR /app/Web/RR
+WORKDIR /robot
 
 # Install Robot Framework and required libraries
 RUN pip install robotframework
