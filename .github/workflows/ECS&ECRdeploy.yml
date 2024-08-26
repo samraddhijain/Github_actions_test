@@ -21,7 +21,7 @@
 
        - name: Run Robot Framework Tests
          run: |
-          robot -i ${tag_name} /robot/Web/RR/TestCases/
+          robot -i ${tag_name} /Web/RR/TestCases/
 
        - name: Checkout
          uses: actions/checkout@v4
