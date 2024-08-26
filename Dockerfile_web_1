@@ -54,4 +54,4 @@ COPY ./Web/RR/TestCases /app/Web/RR/TestCases
 ENV TAG_NAME=membership
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "${TAG_NAME}", "/app/Web/RR/TestCases"]
+CMD ["robot", "--i", "${TAG_NAME}", "/robot/Web/RR/TestCases/"]
