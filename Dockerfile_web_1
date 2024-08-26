@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Define an argument for the tag name
-ARG Tags=membership
+#ARG Tags=membership
 
 # Update the image and install system packages
 RUN apt-get update && apt-get install -y \
@@ -51,10 +51,10 @@ RUN pip install robotframework
 COPY . /robot
 
 # Set the environment variable for the tag name
-ENV Tags=membership
+#ENV Tags=membership
 
 # Echo the value of the Tags variable
-RUN echo "Tags: $Tags"
+#RUN echo "Tags: $Tags"
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--i", "$Tags", "/robot/Web/RR/TestCases/"]
+CMD ["robot", "--i", "membership", "/robot/Web/RR/"]
