@@ -42,16 +42,16 @@ RUN pip3 install selenium==4.15.2 \
 FROM python:3.9-slim
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/Web/RR
 
 # Install Robot Framework and required libraries
 RUN pip install robotframework
 
 # Copy the test files based on TAG_NAME
-COPY . /app
+COPY ./Web/RR/TestCases /app/Web/RR/TestCases
 
 # Set the environment variable for the tag name
 ENV TAG_NAME=membership
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "${TAG_NAME}", "/app/tests/"]
+CMD ["robot", "--include", "${TAG_NAME}", "/app/Web/RR/TestCases"]
