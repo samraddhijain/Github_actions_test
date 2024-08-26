@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Define an argument for the tag name
-ARG TAG_NAME=membership
+ARG Tags=membership
 
 # Update the image and install system packages
 RUN apt-get update && apt-get install -y \
