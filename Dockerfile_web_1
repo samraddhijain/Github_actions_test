@@ -48,7 +48,7 @@ WORKDIR /app/Web/RR
 RUN pip install robotframework
 
 # Copy the test files based on TAG_NAME
-COPY ./Web/RR/TestCases /app/Web/RR/TestCases
+COPY . /robot
 
 # Set the environment variable for the tag name
 ENV TAG_NAME=membership
