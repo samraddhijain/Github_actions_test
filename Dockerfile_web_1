@@ -4,7 +4,6 @@ FROM ubuntu:20.04
 # Set the DEBIAN_FRONTEND to noninteractive to suppress prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-#new added lines
 # Define an argument for the tag name
 ARG TAG_NAME=membership
 
@@ -49,14 +48,10 @@ WORKDIR /app
 RUN pip install robotframework
 
 # Copy the test files based on TAG_NAME
-COPY . /robot
-
-# Copy the specific test cases into the Docker image
-COPY ./Web/RR/TestCases/ /robot/tests/
+COPY . /app
 
 # Set the environment variable for the tag name
 ENV TAG_NAME=membership
 
 # Set the default command to run Robot Framework with an option to specify tags
-CMD ["robot", "--include", "${TAG_NAME}", "/Web/RR/TestCases/"]
-
+CMD ["robot", "--include", "${TAG_NAME}", "/app/tests/"]
